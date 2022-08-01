@@ -2,7 +2,7 @@
 一个简单的生成免杀可执行文件的CS插件
 
 # 注意事项
-插件基于python3实现，通过pyinstaller进行打包。
+插件基于python3实现，通过pyinstaller进行打包。用的CS4.3。
 
 pyinstaller速度有点慢，可能需要多等一会，截止2022-8-2，bypass某绒，360没试过。
 v站13/71
