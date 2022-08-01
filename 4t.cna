@@ -1,5 +1,5 @@
 popup attacks{
-	item("&PyBypass_bate04",{Generator();});
+	item("&PyBypass",{Generator();});
 }
 
 bind Ctrl+G{
@@ -69,8 +69,8 @@ sub build{
            exec("rd /s /q  build");
         # println("rd /s /q  build");
         
-           exec("powershell pyinstaller5 --distpath   $+   $name  $+   --noconsole --key 1235123 --onefile  $+  $tempfile  $+    >  pyinstaller.log.this_is_y 2\>\&1");
-        # println("powershell pyinstaller5 --distpath   $+   $name  $+   --noconsole --onefile  $+  $tempfile  $+    >  pyinstaller.log.this_is_y 2\>\&1");
+           exec("powershell pyinstaller --distpath   $+   $name  $+   --noconsole --key 1235123 --onefile  $+  $tempfile  $+    >  pyinstaller.log.this_is_y 2\>\&1");
+        # println("powershell pyinstaller --distpath   $+   $name  $+   --noconsole --onefile  $+  $tempfile  $+    >  pyinstaller.log.this_is_y 2\>\&1");
     
         $name = $name . "\\\\" . getFileName($name);
         # println($name);
